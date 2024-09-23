@@ -110,12 +110,8 @@ const addUserSalesCountToAllUplines = (rec: UserRec, userID: number): UserRec =>
     salesCount: uplineUser.salesCount + user.salesCount
   }
 
-  return addUserSalesCountToAllUplines(rec, user.uplineID, salesCount)
+  return addUserSalesCountToAllUplines(rec, uplineUser.id)
 }
 
-flatList.forEach(user => {
-  // add up all salesCounts for all uplines
-
-}
 
 
