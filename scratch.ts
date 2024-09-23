@@ -3,10 +3,11 @@ interface User {
 	name: string
 	uplineID: number | null
   salesCount: number
+  aggSalesCount: number
   downlineIDs: number[]
 }
 
-const flatList: Omit<User, 'downlineIDs'>[] = [
+const flatList: Omit<User, 'downlineIDs' | 'aggSalesCount'>[] = [
 	{
 		id: 1,
 		name: 'Aaron',
@@ -54,11 +55,12 @@ const flatListRec: UserRec = flatList.reduce((acc, user) => {
   if (!foundUser) {
     acc[user.id] = {
       ...user,
-      downlineIDs: []
+      downlineIDs: [],
+      aggSalesCount: 0
     }
   } else {
     // if user is found in the accumulator, update the user with her proper data
-    // because she might have been updated with just the id and downlines
+    // because she might have been updated with just the id, downlines and aggSalesCount
     acc[user.id] = {
       ...user,
       ...foundUser,
@@ -78,7 +80,8 @@ const flatListRec: UserRec = flatList.reduce((acc, user) => {
       name: '',
       uplineID: null,
       downlineIDs: [],
-      salesCount: 0
+      salesCount: 0,
+      aggSalesCount: 0,
     }
   } else {
     acc[uplineID] = {
@@ -94,24 +97,27 @@ const flatListRec: UserRec = flatList.reduce((acc, user) => {
   return acc
 }, {} as UserRec)
 
-const addUserSalesCountToAllUplines = (rec: UserRec, userID: number): UserRec => {
+const addUserSalesCountToAllUplines = (rec: UserRec, userID: number): void => {
   // doing this with immer in mind, it will be immutable because of draft
   const user = rec?.[userID]
   if (!user) { throw new Error('addUserSalesCountToAllUplines: User not found.') }
 
-  if (!user.uplineID) { return rec }
-  if (user.salesCount === 0) { return rec }
+  if (!user.uplineID) { return }
+  if (user.salesCount === 0) { return }
 
   const uplineUser = rec?.[user.uplineID]
   if (!uplineUser) { throw new Error('addUserSalesCountToAllUplines: Upline not found.') }
 
   rec[user.uplineID] = {
     ...uplineUser,
-    salesCount: uplineUser.salesCount + user.salesCount
+    aggSalesCount: (uplineUser.aggSalesCount === 0 ? uplineUser.salesCount : uplineUser.aggSalesCount ) + user.salesCount
   }
 
-  return addUserSalesCountToAllUplines(rec, uplineUser.id)
+  addUserSalesCountToAllUplines(rec, uplineUser.id)
 }
 
+flatList.forEach(user => {
+  addUserSalesCountToAllUplines(flatListRec, user.id)
+})
 
 
