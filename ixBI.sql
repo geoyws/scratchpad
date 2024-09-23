@@ -200,6 +200,26 @@ WHERE
 AND
   "market" = 'Malaysia'
 UNION ALL
+SELECT
+  'Southern' as "scope",
+  SUM(CASE WHEN "quarter" = 1 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Q1",
+  SUM(CASE WHEN "month" = 1 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Jan",
+  SUM(CASE WHEN "month" = 2 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Feb",
+  SUM(CASE WHEN "month" = 3 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Mar",
+  SUM(CASE WHEN "quarter" = 2 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Q2",
+  SUM(CASE WHEN "month" = 4 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Apr",
+  SUM(CASE WHEN "month" = 5 THEN "nps" + "ps" + "r" ELSE 0 END) AS "May",
+  SUM(CASE WHEN "month" = 6 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Jun",
+  SUM(CASE WHEN "quarter" = 3 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Q3",
+  SUM(CASE WHEN "month" = 7 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Jul",
+  SUM(CASE WHEN "month" = 8 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Aug",
+  SUM(CASE WHEN "month" = 9 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Sep",
+  SUM(CASE WHEN "quarter" = 4 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Q4",
+  SUM(CASE WHEN "month" = 10 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Oct",
+  SUM(CASE WHEN "month" = 11 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Nov",
+  SUM(CASE WHEN "month" = 12 THEN "nps" + "ps" + "r" ELSE 0 END) AS "Dec"
+
+
 
   
 
