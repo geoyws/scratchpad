@@ -45,7 +45,9 @@ const flatList: Omit<User, 'downlineIDs'>[] = [
   }
 ]
 
-const flatListRec = flatList.reduce((acc, user) => {
+type UserRec = Record<User['id'], User>
+
+const flatListRec: UserRec = flatList.reduce((acc, user) => {
   const foundUser = acc?.[user.id]
 
   // if user is not found in the accumulator, add it
@@ -63,6 +65,7 @@ const flatListRec = flatList.reduce((acc, user) => {
     }
   }
 
+  // next we handle uplines
   const uplineID = user?.uplineID
   // if user has no upline, return the accumulator and end
   if (!uplineID) { return acc }
@@ -89,6 +92,30 @@ const flatListRec = flatList.reduce((acc, user) => {
   }
 
   return acc
-}, {} as Record<User['id'], User>)
+}, {} as UserRec)
+
+const addUserSalesCountToAllUplines = (rec: UserRec, userID: number): UserRec => {
+  // doing this with immer in mind, it will be immutable because of draft
+  const user = rec?.[userID]
+  if (!user) { throw new Error('addUserSalesCountToAllUplines: User not found.') }
+
+  if (!user.uplineID) { return rec }
+  if (user.salesCount === 0) { return rec }
+
+  const uplineUser = rec?.[user.uplineID]
+  if (!uplineUser) { throw new Error('addUserSalesCountToAllUplines: Upline not found.') }
+
+  rec[user.uplineID] = {
+    ...uplineUser,
+    salesCount: uplineUser.salesCount + user.salesCount
+  }
+
+  return addUserSalesCountToAllUplines(rec, user.uplineID, salesCount)
+}
+
+flatList.forEach(user => {
+  // add up all salesCounts for all uplines
+
+}
 
 
