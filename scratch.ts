@@ -5,6 +5,7 @@ interface User {
   salesCount: number
   aggSalesCount: number
   downlineIDs: number[]
+  downlines?: User[]
 }
 
 const flatList: Omit<User, 'downlineIDs' | 'aggSalesCount'>[] = [
@@ -62,8 +63,10 @@ const flatListRec: UserRec = flatList.reduce((acc, user) => {
     // if user is found in the accumulator, update the user with her proper data
     // because she might have been updated with just the id, downlines and aggSalesCount
     acc[user.id] = {
-      ...user,
       ...foundUser,
+      name: user.name,
+      salesCount: user.salesCount,
+      aggSalesCount: user.salesCount
     }
   }
 
@@ -97,9 +100,9 @@ const flatListRec: UserRec = flatList.reduce((acc, user) => {
   return acc
 }, {} as UserRec)
 
-const addUserSalesCountToAllUplines = (rec: UserRec, userID: number): void => {
+const addUserSalesCountToAllUplines = (rec: UserRec, nextUplineID: number, salesCountToPropagate: number): void => {
   // doing this with immer in mind, it will be immutable because of draft
-  const user = rec?.[userID]
+  const user = rec?.[nextUplineID]
   if (!user) { throw new Error('addUserSalesCountToAllUplines: User not found.') }
 
   if (!user.uplineID) { return }
@@ -110,14 +113,30 @@ const addUserSalesCountToAllUplines = (rec: UserRec, userID: number): void => {
 
   rec[user.uplineID] = {
     ...uplineUser,
-    aggSalesCount: (uplineUser.aggSalesCount === 0 ? uplineUser.salesCount : uplineUser.aggSalesCount ) + user.salesCount
+    aggSalesCount: uplineUser.aggSalesCount + salesCountToPropagate
   }
 
-  addUserSalesCountToAllUplines(rec, uplineUser.id)
+  addUserSalesCountToAllUplines(rec, uplineUser.id, salesCountToPropagate)
 }
 
+// propagate salesCount to aggSalesCount
 flatList.forEach(user => {
-  addUserSalesCountToAllUplines(flatListRec, user.id)
+  addUserSalesCountToAllUplines(flatListRec, user.id, user.salesCount)
 })
 
+console.log(JSON.stringify(flatListRec, null, 2));
 
+// generate tree
+const genTree = (rec: UserRec, rootUserID: number): User => {
+  const user = rec?.[rootUserID]
+  if (!user) { throw new Error('genTree: User not found.') }
+
+  const downlines = user.downlineIDs.map(downlineID => genTree(rec, downlineID))
+
+  return {
+    ...user,
+    downlines
+  }
+} 
+
+console.log(JSON.stringify(genTree(flatListRec, 1), null, 2));
