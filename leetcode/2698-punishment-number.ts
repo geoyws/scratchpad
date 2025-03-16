@@ -40,7 +40,9 @@ function punishmentNumber(n: number): number {
         
 
         let pivotI = 0 // pivot index for the partition permutations
-        let perm: string[] = new Array(partL).fill("1") // default permutation
+        let perm: number[][] = [new Array(partL).fill(1)] // default permutation
+        // now we have to fill up the permutations
+      //
 
         while (pivotI < partL - 1) { 
           // as long as we're not at the final index (which means no more permutations)
@@ -48,9 +50,13 @@ function punishmentNumber(n: number): number {
           
           // first we use the current permutation's string to see if there's a match.
           // we shall use string subsets to join the strings
-          const currStr = perm.reduce((a, c, i) => {
-            return a + part[i]
-          }, "")
+          let currStr = ''
+          let partI = 0 // pointer to get the next partition string
+          
+          while (partI < partL - 1) {
+            currStr += part.slice(i, c).join("")
+
+          }
 
            break
             
