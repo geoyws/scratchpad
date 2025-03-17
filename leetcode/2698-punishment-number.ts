@@ -41,8 +41,23 @@ function punishmentNumber(n: number): number {
 
         let pivotI = 0 // pivot index for the partition permutations
         let perm: number[][] = [new Array(partL).fill(1)] // default permutation
+      let permI = 0 // permutation index
+      
         // now we have to fill up the permutations
-      //
+        while (pivotI < partL - 1) {
+          const currPerm = perm[perm.length - 1] // current permutation
+          // now we have to get the next permutation
+            if (i === pivotI) {
+              acc.push(curr + 1)
+              // now we have to remove the next item mutatively from the acc
+
+            } else {
+              acc.push(curr)
+            }
+        }
+
+        // now we reset the pivotI to 0
+        pivotI = 0
 
         while (pivotI < partL - 1) { 
           // as long as we're not at the final index (which means no more permutations)
